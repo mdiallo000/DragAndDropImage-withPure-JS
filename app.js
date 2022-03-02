@@ -2,7 +2,7 @@ const input = document.querySelector('input');
 const preview = document.querySelector('.preview');
 const dropzone = document.querySelector('.dropzone');
 input.style.opacity = 0;
-
+const canvas = document.querySelector('canvas');
 function updateImageDisplay() {
   // ** right since this function is responsible for updating our preview we need to make sure the preview is clean and new after each change, so the function does exactly that.
   while (preview.firstChild) {
@@ -69,6 +69,7 @@ function returnFileSize(number) {
     return (number / 1048576).toFixed(1) + 'MB';
   }
 }
+// ************************************************************************************************************************************************************************************************************************
 
 dropzone.addEventListener(
   'dragover',
@@ -108,6 +109,42 @@ dropzone.addEventListener(
           image.src = URL.createObjectURL(file);
           listitem.appendChild(image);
           listitem.appendChild(para);
+
+          // ** Here is code to manipulate the image we get
+          var MAX_WIDTH = 800;
+          var MAX_HEIGHT = 600;
+          var width = image.width;
+          var height = image.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+
+          let ctx = canvas.getContext('2d');
+          ctx.drawImage(image, 0, 0, width, height);
+          var imgData = ctx.createImageData(width, height);
+          var data = imgData.data;
+          var pixels = ctx.getImageData(0, 0, width, height);
+          for (var i = 0, ii = pixels.data.length; i < ii; i += 4) {
+            var r = pixels.data[i + 0];
+            var g = pixels.data[i + 1];
+            var b = this.pixels.data[i + 2];
+            data[i + 0] = r * 0.393 + g * 0.769 + b * 0.189;
+            data[i + 1] = r * 0.349 + g * 0.686 + b * 0.168;
+            data[i + 2] = r * 0.272 + g * 0.534 + b * 0.131;
+            data[i + 3] = 255;
+          }
+          ctx.putImageData(imgData, 0, 0);
         } else {
           para.textContent = 'FileType Invalid, please choose the proper file';
           listitem.appendChild(para);
