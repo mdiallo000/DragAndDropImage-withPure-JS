@@ -81,7 +81,41 @@ dropzone.addEventListener(
   'drop',
   function (event) {
     event.preventDefault();
-    // Ready to do something with the dropped object
+    while (preview.firstChild) {
+      preview.removeChild(preview.firstChild);
+    }
+
+    let curFile = event.dataTransfer.files;
+    console.log(curFile);
+
+    if (curFile.length === 0) {
+      let para = document.createElement('p');
+      para.textContent = 'No file was Selected, try Again';
+      preview.appendChild(para);
+    } else {
+      let list = document.createElement('ol');
+      preview.appendChild(list);
+
+      for (let file of curFile) {
+        let listitem = document.createElement('li');
+        let para = document.createElement('p');
+        if (validFileType(file)) {
+          para.textContent = `File name is ${file.name},file type ${
+            file.type
+          }, with a size of ${returnFileSize(file.size)}.`;
+
+          const image = document.createElement('img');
+          image.src = URL.createObjectURL(file);
+          listitem.appendChild(image);
+          listitem.appendChild(para);
+        } else {
+          para.textContent = 'FileType Invalid, please choose the proper file';
+          listitem.appendChild(para);
+        }
+
+        list.appendChild(listitem);
+      }
+    }
   },
   true
 );
