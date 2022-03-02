@@ -70,4 +70,20 @@ function returnFileSize(number) {
   }
 }
 
+dropzone.addEventListener(
+  'dragover',
+  function (event) {
+    event.preventDefault();
+  },
+  true
+);
+dropzone.addEventListener(
+  'drop',
+  function (event) {
+    event.preventDefault();
+    // Ready to do something with the dropped object
+  },
+  true
+);
+
 input.addEventListener('change', updateImageDisplay);
